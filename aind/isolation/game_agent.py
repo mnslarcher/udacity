@@ -177,6 +177,7 @@ class MinimaxPlayer(IsolationPlayer):
         # Return the best move from the last completed search iteration
         return best_move
 
+
     def _terminal_test(self, game):
         """ Return True if the game is over for the active player
         and False otherwise.
@@ -298,7 +299,21 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
 
         # TODO: finish this function!
-        raise NotImplementedError
+        if self._terminal_test(game):
+            best_move = (-1, -1)
+        else:
+            best_move = game.get_legal_moves()[0]
+
+        try:
+            depth = 1
+            while True:
+                best_move = self.alphabeta(game, depth)
+                depth += 1
+
+        except SearchTimeout:
+            pass
+
+        return best_move
 
 
     def _terminal_test(self, game):
