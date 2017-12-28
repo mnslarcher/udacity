@@ -10,6 +10,28 @@ class SearchTimeout(Exception):
     pass
 
 
+def get_positions_reachable(game, player):
+    new_positions = set(game.get_legal_moves(player))
+    total_new_positions = new_positions.copy()
+    positions_reachable = new_positions.copy()
+    blank_spaces = set(game.get_blank_spaces()) - new_positions
+
+    directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2),
+        (2, -1), (2, 1)]
+
+    while total_new_positions:
+        move_list = list(total_new_positions)
+        total_new_positions = set()
+        for move in move_list:
+            r, c = move
+            new_positions = set((r + dr, c + dc) for dr, dc in directions
+                       if (r + dr, c + dc) in blank_spaces)
+            total_new_positions.update(new_positions)
+            blank_spaces -= new_positions
+        positions_reachable.update(total_new_positions)
+    return positions_reachable
+
+
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
     of the given player.
@@ -40,8 +62,9 @@ def custom_score(game, player):
     elif game.is_winner(player):
         return float("inf")
     else:
-        own_moves = len(game.get_legal_moves(player))
-        opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+        own_moves = len(get_positions_reachable(game, player))
+        opp_moves = len(get_positions_reachable(game, game.get_opponent(
+            player)))
         return float(own_moves - opp_moves)
 
 
@@ -68,7 +91,14 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+    elif game.is_winner(player):
+        return float("inf")
+    else:
+        own_moves = len(game.get_legal_moves(player))
+        opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+        return float(own_moves - opp_moves)
 
 
 def custom_score_3(game, player):
@@ -94,7 +124,14 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+    elif game.is_winner(player):
+        return float("inf")
+    else:
+        own_moves = len(game.get_legal_moves(player))
+        opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+        return float(own_moves - opp_moves)
 
 
 class IsolationPlayer:
@@ -256,8 +293,11 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        return max(game.get_legal_moves(), key=lambda m: self._min_value(
-            game.forecast_move(m), depth - 1))
+        if self._terminal_test(game):
+            return (-1, -1)
+        else:
+            return max(game.get_legal_moves(), key=lambda m: self._min_value(
+                game.forecast_move(m), depth - 1))
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -307,7 +347,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         try:
             depth = 1
             while True:
-                best_move = self.alphabeta(game, depth)
+                new_move = self.alphabeta(game, depth)
+                if new_move != (-1, -1):
+                    best_move = new_move
                 depth += 1
 
         except SearchTimeout:
