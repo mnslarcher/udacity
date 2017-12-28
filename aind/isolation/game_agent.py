@@ -300,6 +300,56 @@ class AlphaBetaPlayer(IsolationPlayer):
         # TODO: finish this function!
         raise NotImplementedError
 
+
+    def _terminal_test(self, game):
+        """ Return True if the game is over for the active player
+        and False otherwise.
+        """
+        return not game.get_legal_moves()
+
+
+    def _min_value(self, game, depth, alpha, beta):
+        """ Return the value for a win (+inf) if the game is over,
+        otherwise return the minimum value over all legal child
+        nodes.
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        elif self._terminal_test(game) or (depth == 0):
+            return self.score(game, self)
+        else:
+            v = float("inf")
+            for move in game.get_legal_moves():
+                v = min(v, self._max_value(game.forecast_move(move),
+                    depth - 1, alpha, beta))
+                if v <= alpha:
+                    return v
+                else:
+                    beta = min(beta, v)
+            return v
+
+
+    def _max_value(self, game, depth, alpha, beta):
+        """ Return the value for a loss (-inf) if the game is over,
+        otherwise return the maximum value over all legal child
+        nodes.
+        """
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        elif self._terminal_test(game) or (depth == 0):
+            return self.score(game, self)
+        else:
+            v = float("-inf")
+            for move in game.get_legal_moves():
+                v = max(v, self._min_value(game.forecast_move(move),
+                    depth - 1, alpha, beta))
+                if v >= beta:
+                    return v
+                else:
+                    alpha = max(alpha, v)
+            return v
+
+
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf")):
         """Implement depth-limited minimax search with alpha-beta pruning as
         described in the lectures.
@@ -349,4 +399,14 @@ class AlphaBetaPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        v = float("-inf")
+        best_move = (-1, -1)
+        for move in game.get_legal_moves():
+            vm = self._min_value(game.forecast_move(move), depth - 1, alpha,
+                beta)
+            if v < vm:
+                v = vm
+                best_move = move
+            alpha = max(alpha, v)
+
+        return best_move
