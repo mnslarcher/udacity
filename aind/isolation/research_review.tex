@@ -1,0 +1,46 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{natbib}
+
+\begin{document}
+
+\title{Research Review of AlphaGo by the DeepMind Team}
+\author{Mario Namtao Shianti Larcher}
+
+\maketitle
+
+\begin{abstract}
+
+In an article on Nature \cite{AlphaGoNature}, the authors of AlphaGo introduced a new approach to computer Go that led them to the astonishing result of defeating Fan Hui, a professional 2 \textit{dan}, and the winner of the 2013, 2014 and 2015 European Go championships. 
+This was the first time that a computer Go program defeated a human professional player, without handicap, in the full game of Go - a feat that was previously believed to be at least a decade away.
+
+\end{abstract}
+
+\section{Techniques}
+
+Before AlphaGo, the strongest Go programs were based on a technique called Monte Carlo tree search (MCTS) that use Monte Carlo rollouts to estimate the value of each state in a search tree, enhanced by policies that are trained to predict human expert moves. 
+These policies are used to narrow the search to a beam of high-probably actions, and to sample actions during rollouts.  
+
+AlphaGo also uses MCTS but only in combination with two other important pieces: a `value network' to evaluate board positions and a `policy network' to select moves.
+These networks are similar to the architectures that have achieved unprecedented performance in visual domains, in particular they use deep convolutional neural networks passing in the board position as a $19 \times 19$ image.
+
+They train the neural networks using a pipeline consisting of several stages of machine learning. First they train a supervised learning (SL) policy network $p_{\sigma}$ directly from expert human moves and a fast policy $p_{\pi}$ that can rapidly sample actions during rollouts.
+Next, they train a reinforcement learning (RL) policy network $p_{\rho}$ that improves the SL policy by optimizing the final outcome of games of self-play. 
+Finally, they train a value network $p_{\theta}$ that predicts the winner of games played by the RL policy network against itself.
+
+AlphaGo combines the policy and value networks in a MCTS algorithm that selects actions by lookahead search. 
+The policy network $p_{\rho}$ here is used for estimating prior probabilities $P$ for each legal action $a$, $P(s, a) = p_{\rho}(a \vert s)$ where $(s, a)$ is an edge in the search tree. 
+The value network $p_{\theta}$ and the fast policy $p_{\pi}$ are instead used for leaf node evaluation, see the section `Searching with policy and value networks'  in \cite{AlphaGoNature} for more details.
+
+\section{Results}
+In addition to the incredible result already mentioned, defeating Fan Hui by 5 games to 0, AlphaGo was also tested against the principal Go programs, commercial (Crazy Stone and Zen) and open source (Pachi, Fuego and GnuGo). 
+The results of the tournament suggest that single-machine AlphaGo is many \textit{dan} ranks stronger that any previous Go program, winning 494 out of 495 (99.8\%) games against other Go programs. 
+They also tested a distributed version of AlphaGo which turned out to be significantly stronger, winning 77\% of games against single-machine AlphaGo and 100\% of its games against other programs.
+
+\bibliographystyle{plain}
+\bibliography{research_review.bib}
+
+\end{document}
