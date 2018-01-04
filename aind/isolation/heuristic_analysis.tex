@@ -1,0 +1,76 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\begin{document}
+
+\title{Heuristic Analysis}
+\author{Mario Namtao Shianti Larcher}
+
+\maketitle
+
+\begin{abstract}
+
+In this report I analyze three new heuristics for the game Isolation. 
+The most successful heuristic presented here  can be seen as a generalization of the logic used by \textit{improved\_score} and it reach the goal of outperforming this and the other heuristics defined in \textit{sample\_players.py}.
+
+\end{abstract}
+
+\section{Techniques}
+
+The main heuristic created, the one used by \textit{AB\_Custom}, starts from the logic used by  \textit{AB\_Improved} and generalized it.
+\textit{AB\_Improved} uses the scoring function \textit{improved\_score}, this function assigns a score that is equal to the number of legal moves for the active player minus the number of legal moves for the opponent. 
+The intuition behind \textit{custom\_score} is to look a little bit more into the future respect to the logic used by \textit{improved\_score}, how many different positions can I reach in two consecutive moves (without any move from the other player)? and in three? and so on. 
+Similarly to \textit{improved\_score} also in \textit{custom\_score} the final score is the difference between the number of player's reachable positions and those of the opponent. Is it clear that how much ahead one have to look is an hyper-parameter and it needs to be tuned, after some search I found out that $max\_ahead=4$ (see the code in \textit{game\_agent.py}) maximizes the performance of \textit{AB\_Custom}.
+
+The second logic introduced, defined in \textit{custom\_score\_3}, is a mix between \textit{center\_score} and \textit{improved\_score}, in particular it uses the concept of distance from the center like \textit{center\_score} and it makes the difference between this distance for the opponent and the active player like \textit{improved\_score}. 
+The order in the difference matter and some tests confirmed the intuition that being near to the center is a positive fact so the final score is $opp\_distance - own\_distance$.
+
+Finally the third logic, defined in \textit{custom\_score\_2}, tries to make a linear combination of the two previous scores. 
+Also here we have an hyper-parameter to tune, how much weight give to the first score (the weight of the second score is $1-weight_{first\_score}$, where $weight_{first\_score}\in\left[ 0, 1\right]$). 
+I tried different values but no one seemed to produce a better score than \textit{custom\_score}. 
+In the results of section \ref{sec:results} I report what I got with  $weight_{first\_score}=0.75$.
+
+\section{Results}\label{sec:results}
+
+Given the variability of the results, I decided to set $NUM\_MATCHES=50$ inside  \textit{tournament.py}. 
+
+The results of the tournament are presented in Table \ref{tab:pm}, the player \textit{AB\_Custom} outperforms \textit{AB\_Improved} not only in the direct match (won by\textit{AB\_Custom} 57  to 43) but also in the matches with most of the other opponents. 
+The worst result obtained by \textit{AB\_Custom} is a victory with \textit{AB\_Open} 55 to 45 and the final win rate is $77.4\%$.
+
+The final suggestion is obviously to use \textit{custom\_score}, it outperforms the previously strongest heuristic \textit{improved\_score} and it is the only tested that, if used by a player, win by at least 5 points all the matches with other type of players. 
+Finally, another reason for using \textit{custom\_score} is that it looks more steps ahead in the future (without the computational burden of a full simulation) this aspect will probably results crucial also against other players who only look at the current board position.
+
+\begin{table}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline 
+Match \# & Opponent & \multicolumn{2}{c|}{AB\_Improved} & \multicolumn{2}{c|}{AB\_Custom}  & \multicolumn{2}{c|}{AB\_Custom\_2} & \multicolumn{2}{c|}{AB\_Custom\_3} \\ 
+\hline 
+  &   & Won & Lost & Won & Lost & Won & Lost & Won & Lost \\ 
+\hline 
+1 & Random & 99 & 1 & 97 & 3 & 100 & 0 & 96 & 4 \\ 
+\hline 
+2 & MM\_Open & 89 & 11 & 83 & 17 & 89 & 11 & 89 & 11 \\ 
+\hline 
+3 & MM\_Center & 95 & 5 & 97 & 3 & 98 & 2 & 98 & 2 \\ 
+\hline 
+4 & MM\_Improved & 86 & 14 & 89 & 11 & 86 & 14 & 80 & 20 \\
+\hline 
+5 & AB\_Open & 49 & 51 & 55 & 45 & 49 & 51 & 54 & 46 \\ 
+\hline 
+6 & AB\_Center & 58 & 42 & 64 & 36 & 61 & 39 & 50 & 50 \\ 
+\hline 
+7 & AB\_Improved & 55 & 45 & 57 & 43 & 53 & 47 & 50 & 50 \\ 
+\hline 
+8 & \textbf{Win Rate:} & \multicolumn{2}{c|}{75.9\%} & \multicolumn{2}{c|}{77.4\%}  & \multicolumn{2}{c|}{76.6\%} & \multicolumn{2}{c|}{73.9\%} \\
+\hline 
+\end{tabular}%
+}
+\caption{Playing Matches}\label{tab:pm}
+\end{table}
+
+\end{document}
