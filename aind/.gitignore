@@ -1,0 +1,11 @@
+__pycache__
+.ipynb_checkpoints
+*.aux
+*.dvi
+*.pdf
+*.gz
+*.zip
+*.json
+*.bbl
+*.blg
+readings
