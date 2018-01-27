@@ -61,15 +61,17 @@ class AirCargoProblem(Problem):
             """
             loads = []
             # TODO create all load ground actions from the domain Load action
+            expr_at = 'At({}, {})'
+            expr_in = 'In({}, {})'
             for c in self.cargos:
                 for p in self.planes:
                     for a in self.airports:
-                        precond_pos = [expr("At({}, {})".format(c, a)),
-                                       expr("At({}, {})".format(p, a)),
+                        precond_pos = [expr(expr_at.format(c, a)),
+                                       expr(expr_at.format(p, a)),
                                        ]
                         precond_neg = []
-                        effect_add = [expr("In({}, {})".format(c, p))]
-                        effect_rem = [expr("At({}, {})".format(c, a))]
+                        effect_add = [expr(expr_in.format(c, p))]
+                        effect_rem = [expr(expr_at.format(c, a))]
                         load = Action(expr("Load({}, {}, {})".format(c, p, a)),
                                       [precond_pos, precond_neg],
                                       [effect_add, effect_rem])
@@ -83,20 +85,22 @@ class AirCargoProblem(Problem):
             """
             unloads = []
             # TODO create all Unload ground actions from the domain Unload action
+            expr_at = 'At({}, {})'
+            expr_in = 'In({}, {})'
             for c in self.cargos:
                 for p in self.planes:
                     for a in self.airports:
-                        precond_pos = [expr("In({}, {})".format(c, p)),
-                                       expr("At({}, {})".format(p, a)),
+                        precond_pos = [expr(expr_in.format(c, p)),
+                                       expr(expr_at.format(p, a)),
                                        ]
                         precond_neg = []
-                        effect_add = [expr("At({}, {})".format(c, a))]
-                        effect_rem = [expr("In({}, {})".format(c, p))]
-                        load = Action(
+                        effect_add = [expr(expr_at.format(c, a))]
+                        effect_rem = [expr(expr_in.format(c, p))]
+                        unload = Action(
                             expr("Unload({}, {}, {})".format(c, p, a)),
                             [precond_pos, precond_neg],
                             [effect_add, effect_rem])
-                        unloads.append(load)
+                        unloads.append(unload)
             return unloads
 
         def fly_actions():
@@ -282,12 +286,12 @@ def air_cargo_p3() -> AirCargoProblem:
     for ii in range(len(at1)):
         for a in airports:
             if at2[ii] != a:
-                neg.append('At({}, {}'.format(at1[ii], a))
+                neg.append(expr(expr_at.format(at1[ii], a)))
         if at1[ii] in cargos:
             for p in planes:
-                neg.append('In({}, {})'.format(at1[ii], p))
+                neg.append(expr(expr_in.format(at1[ii], p)))
     init = FluentState(pos, neg)
-    at1 = ['C1', 'C2', 'C3', 'C4']
-    at2 = ['JFK', 'SFO', 'JFK', 'SFO']
+    at1 = ['C1', 'C3', 'C2', 'C4']
+    at2 = ['JFK', 'JFK', 'SFO', 'SFO']
     goal = [expr(expr_at.format(at1[ii], at2[ii])) for ii in range(len(at1))]
     return AirCargoProblem(cargos, planes, airports, init, goal)
