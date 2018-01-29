@@ -520,19 +520,14 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for Inconsistent Support between nodes
-        def achieve_both(a, l1, l2):
-            if set((l1, l2)) <= a.children:
-                return True
-            else:
-                return False
 
         test = False
 
         for par_s1 in node_s1.parents:
-            if achieve_both(par_s1, node_s1, node_s2):
+            if set((node_s1, node_s2)) <= par_s1.children:
                 return False
             for par_s2 in node_s2.parents:
-                if achieve_both(par_s2, node_s1, node_s2):
+                if set((node_s1, node_s2)) <= par_s2.children:
                     return False
                 if par_s1.is_mutex(par_s2):
                     test = True
