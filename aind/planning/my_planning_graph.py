@@ -397,7 +397,14 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for Inconsistent Effects between nodes
-        return False
+        a1_eff_add = set(node_a1.action.effect_add)
+        a2_eff_add = set(node_a2.action.effect_add)
+        a1_eff_rem = set(node_a1.action.effect_rem)
+        a2_eff_rem = set(node_a2.action.effect_rem)
+        if len(a1_eff_add & a2_eff_rem) + len(a2_eff_add & a1_eff_rem):
+            return True
+        else:
+            return False
 
     def interference_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
         """
@@ -414,7 +421,19 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for Interference between nodes
-        return False
+        a1_eff_add = set(node_a1.action.effect_add)
+        a2_eff_add = set(node_a2.action.effect_add)
+        a1_eff_rem = set(node_a1.action.effect_rem)
+        a2_eff_rem = set(node_a2.action.effect_rem)
+        a1_pre_pos = set(node_a1.action.precond_pos)
+        a2_pre_pos = set(node_a2.action.precond_pos)
+        a1_pre_neg = set(node_a1.action.precond_neg)
+        a2_pre_neg = set(node_a2.action.precond_neg)
+        if (len(a1_eff_add & a2_pre_neg) + len(a1_eff_rem & a2_pre_pos) +
+            len(a2_eff_add & a1_pre_neg) + len(a2_eff_rem & a1_pre_pos)):
+            return True
+        else:
+            return False
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
         """
@@ -428,7 +447,21 @@ class PlanningGraph():
         """
 
         # TODO test for Competing Needs between nodes
-        return False
+        a1_pre_pos = set(node_a1.action.precond_pos)
+        a2_pre_pos = set(node_a2.action.precond_pos)
+        a1_pre_neg = set(node_a1.action.precond_neg)
+        a2_pre_neg = set(node_a2.action.precond_neg)
+
+        test1 = len(a1_pre_pos & a2_pre_neg) + len(a1_pre_neg & a2_pre_pos) > 0
+        test2 = False
+        for pre_a1 in node_a1.parents:
+            for pre_a2 in node_a2.parents:
+                if pre_a1.is_mutex(pre_a2):
+                    test2 = True
+        if test1 or test2:
+            return True
+        else:
+            return False
 
     def update_s_mutex(self, nodeset: set):
         """ Determine and update sibling mutual exclusion for S-level nodes
@@ -463,7 +496,12 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for negation between nodes
-        return False
+        if (isinstance(node_s2, node_s1.__class__) and
+            node_s1.is_pos != node_s2.is_pos and
+            node_s1.symbol == node_s2.symbol):
+            return True
+        else:
+            return False
 
     def inconsistent_support_mutex(self, node_s1: PgNode_s, node_s2: PgNode_s):
         """
@@ -482,7 +520,23 @@ class PlanningGraph():
         :return: bool
         """
         # TODO test for Inconsistent Support between nodes
-        return False
+        def achieve_both(a, l1, l2):
+            if set((l1, l2)) <= a.children:
+                return True
+            else:
+                return False
+
+        test = False
+
+        for par_s1 in node_s1.parents:
+            if achieve_both(par_s1, node_s1, node_s2):
+                return False
+            for par_s2 in node_s2.parents:
+                if achieve_both(par_s2, node_s1, node_s2):
+                    return False
+                if par_s1.is_mutex(par_s2):
+                    test = True
+        return test
 
     def h_levelsum(self) -> int:
         """The sum of the level costs of the individual goals (admissible if goals independent)
@@ -492,4 +546,19 @@ class PlanningGraph():
         level_sum = 0
         # TODO implement
         # for each goal in the problem, determine the level cost, then add them together
+        goals = set(self.problem.goal)
+
+        def is_goal_in_lvl(goal, lvl):
+            for s_node in lvl:
+                if (goal == s_node.symbol) and s_node.is_pos:
+                    return True
+            return False
+
+        level = 0
+        while goals:
+            for g in self.problem.goal:
+                if (g in goals) & is_goal_in_lvl(g, self.s_levels[level]):
+                    level_sum += level
+                    goals.remove(g)
+            level += 1
         return level_sum
