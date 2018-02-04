@@ -1,0 +1,36 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{natbib}
+
+\begin{document}
+
+\title{Research Review}
+\author{Mario Namtao Shianti Larcher}
+
+\maketitle
+
+\begin{abstract}
+
+This report is about three key developments in AI: the General Problem Solver (GPS) \cite{GPS}, the STanford Research Institute Problem Solver (STRIPS) \cite{STRIPS} and the Planning Domain Definition Language (PDDL) \cite{PDDL}.
+
+\end{abstract}
+
+\section{GPS}
+
+The General Problem Solver (GPS) \cite{GPS} is a computer program created in 1959 by Herbert A. Simon, J.C. Shaw, and Allen Newell intended to work as a universal problem solver machine. The authors were interested in the psychology of human thinking and their studies were in part inspired by two main movements, the Behaviorist and the Gestalt. GPS was developed and tested analyzing  the human behavior in a given task using protocol analysis. One of the key insights introduced by GPS is the separation between knowledge of problems (rules represented as input data) from its strategy of how to solve problems. GPS deals with a task environment consisting of \textit{objects}, \textit{operators} and \textit{goals}. There are three types of goals: \textit{transform}, \textit{reduce difference} and \textit{apply operator}.	A goal is achieved trying to achieve sub-goals whose attainment leads to the attainment of the initial goal (a recursive system). GPS can solve some simple problems but it fails in real applications where the search is easily lost in the combinatorial explosion.
+
+\section{STRIPS}
+
+The STanford Research Institute Problem Solver (STRIPS) \cite{STRIPS} is a problem solver that attempts to find a sequence of operators in a space of world models to transform a given initial model into a model in which a given goal formula can be proven to be true. In STRIPS, a world model is represented by a set of well-formed formulas (wffs) of the first-order predicate calculus. The problem space for STRIPS is defined by an initial world model, the set of available operations and their effects, and the goal statement. Given the use of first-order predicate calculus wffs, it is possible to use theorem-proving programs to answer questions about a model. The  operators are grouped into families called schemata, each operator is defined by two main parts: a description of the effects of the operator, and the conditions under which the operator is applicable. STRIPS adopts a GPS strategy of extracting ``differences'' between the present world model and the goal and of identifying operators that are ``relevant'' to reducing these differences. For a better memory usage, each world model produced by STRIPS is defined by two clause lists, DELETIONS and ADDITIONS which represent the changes in the initial model needed to form the model being defined. Today STRIPS is the base for most of the languages for expressing automated planning problem instances in use, such languages are commonly known as action languages.
+
+\section{PDDL}
+
+The Planning Domain Definition Language (PDDL) \cite{PDDL} is an attempt to standardize Artificial Intelligence (AI) planning languages. PDDL supports: basic STRIPS-style actions, conditional effects, object creation and destruction, domain over stratified theories,  specification of safety constrains, specification of hierarchical actions composed by sub-actions and sub-goals and different subsets of language features to manage different problems in multiple domains. Every domain defined by PDDL should declare which requirements it assumes. PDDL is intended to express only the physics of a domain, and have to be extended to represent the search-control advice that most planners need. PDDL tries to solve problems defined with respect a domain that needs to specify two things: an initial situation, and a goal to be achieved. PDDL has been used as the standard language for the International Planning Competition since 1998.
+
+\bibliographystyle{plain}
+\bibliography{research_review.bib}
+
+\end{document}
