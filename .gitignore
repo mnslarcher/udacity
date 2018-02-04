@@ -8,6 +8,6 @@ __pycache__
 *.dvi
 *.pdf
 *.gz
-*.bbl
+*.log
 *.blg
 readings
