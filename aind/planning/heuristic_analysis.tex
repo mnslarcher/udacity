@@ -14,13 +14,13 @@
 
 \begin{abstract}
 
-In this report I analyze different heuristic and non-heuristic search methods in the context of deterministic logistics planning problems.
+In this report I will analyze different heuristic and non-heuristic search methods in the context of deterministic logistics planning problems.
 
 \end{abstract}
 
 \section{Optimal plan for Problems 1, 2, and 3}
 
-In table \ref{tab:opt} are reported three possible optimal plans for problems 1, 2 and 3. These solutions are the result of \textit{bread-first search} that is optimal if the path cost is a non-decreasing function of the depth of the node, as in our case.
+In table \ref{tab:opt} are reported three possible optimal plans for Problems 1, 2 and 3. These solutions are the result of \textit{breadth-first search} that is optimal if the path cost is a non-decreasing function of the depth of the node, as in our case.
 
 \begin{table}
 \resizebox{\linewidth}{!}{%
@@ -88,7 +88,7 @@ Problem \# & Search Algorithm & Expansions & Goal Tests & New Node & Plan Length
 \caption{Comparison and contrast of non-heuristic search result metrics.}\label{tab:nonheu}
 \end{table}
 
-In table \ref{tab:nonheu} is presented a comparison between three uninformed search strategies: \textit{breadth-first search}, \textit{depth-first search} and \textit{uniform-cost search}. From the results we can notice some expected behaviors, \textit{breadth-first search} and  \textit{uniform-cost search} are always optimal (as already observed our path cost is a non-decreasing function of the depth of the node), \textit{uniform-cost search} is strictly less efficient than \textit{breadth-first search} because our step costs are equal and this technique examines all the nodes at the goal's depth to see if one has a lower cost where \textit{breadth-first search} as soon as it generates a goal. Finally  \textit{depth-first search} is not optimal (the solution are in fact significantly longer that the optimal length) but is faster in all three problems, this is not always guaranteed and depends on the problem.
+In table \ref{tab:nonheu} is presented a comparison between three uninformed search strategies: \textit{breadth-first search}, \textit{depth-first search} and \textit{uniform-cost search}. From the results we can notice some expected behaviors, \textit{breadth-first search} and  \textit{uniform-cost search} are always optimal (as already observed our path cost is a non-decreasing function of the depth of the node). \textit{Uniform-cost search} is strictly less efficient than \textit{breadth-first search} because our step costs are equal and this technique examines all the nodes at the goal's depth to see if one has a lower cost, where \textit{breadth-first search} stops as soon as it generates a goal. Finally,  \textit{depth-first search} is not optimal (solutions are in fact significantly longer that the optimal length) but is faster in all three problems, this is not always guaranteed and depends on the problem.
 
 \section{Comparison and contrast of heuristic search result metrics}
 
@@ -115,11 +115,11 @@ Problem \# & Search Algorithm & Expansions & Goal Tests & New Node & Plan Length
 \caption{Comparison and contrast of heuristic search result metrics.}\label{tab:heu}
 \end{table}
 
-The graph version of $A^{*}$ search is optimal if the heuristic used is consistent, \textit{level-sum} its not consistent and then we don't have 
-guarantees of optimality. \emph{ignore preconditions} is consistent so we know that $A^{*}$ - \emph{ignore preconditions} is optimal. For our three problem both the heuristics (with $A^{*}$) find optimal solutions, \emph{level-sum} do this expanding less node where \emph{ignore preconditions} use less time to reach a goal state (this can be due also by an inefficient implementation of \emph{level-sum}).
+The graph version of $A^{*}$ search is optimal if the heuristic used is consistent, \textit{level-sum} it's not consistent and then we don't have 
+guarantees of optimality. \emph{Ignore preconditions} is consistent so we know that $A^{*}$ - \emph{ignore preconditions} is optimal. For our three problems both the heuristics (with $A^{*}$) find optimal solutions, \emph{level-sum} does this expanding less nodes where \emph{ignore preconditions} uses less time to reach a goal state (this could be due also by an inefficient implementation of \emph{level-sum}).
 
-\section{Conclusions}
+\section{Conclusion}
 
-For the problems under analysis $A^{*}$ - \emph{ignore preconditions} is  strictly better of all optimal search methods in term of time and expansions. The fastest search in all the problems is \emph{depth-first search} but the solutions found by this method are significantly longer than optimal solutions.
+For the problems under analysis $A^{*}$ - \emph{ignore preconditions} is  strictly better of all optimal search methods in term of time and expansions. The fastest search in all problems is \emph{depth-first search} but the solutions found by this method are significantly longer than optimal solutions.
 
 \end{document}
