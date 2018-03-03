@@ -75,30 +75,30 @@ class SelectorBIC(ModelSelector):
         :return: GaussianHMM object
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # TODO implement model selection based on BIC scores
         def bic(logL, p, logN):
             return -2*logL + p*logN
 
         min_score = float('inf')
-        best_hmm_model = None
+        best_model = None
         n_features = self.X.shape[1]
         N = len(self.X)
         logN = math.log(N)
         for n_comp in range(self.min_n_components, self.max_n_components + 1):
             try:
                 model = self.base_model(n_comp)
-                model.fit(self.X, self.lengths)
                 logL = model.score(self.X, self.lengths)
                 # Dana Sheahen on slack: p = n^2 + 2*d*n - 1
                 p = n_comp**2 + 2*n_comp*n_features - 1
                 score = bic(logL, p, logN)
                 if score < min_score:
                     min_score = score
-                    best_hmm_model = model
+                    best_model = model
             except:
-                pass
-        return best_hmm_model
+                continue
+        return best_model
 
 
 class SelectorDIC(ModelSelector):
@@ -113,9 +113,32 @@ class SelectorDIC(ModelSelector):
 
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # TODO implement model selection based on DIC scores
-        raise NotImplementedError
+        def dic(logLs, M):
+            logL_i = logLs[self.this_word]
+            LogLs_allbuti = [logLs[word] for word in self.words if word != 
+                             self.this_word]
+            return logL_i - sum(LogLs_allbuti)/(M - 1)
+
+        best_score = float('-inf')
+        best_model = None
+        M = len(self.words)
+        for n_comp in range(self.min_n_components, self.max_n_components + 1):
+                try:
+                    logLs = {}
+                    model = self.base_model(n_comp)
+                    for word in self.words:
+                        X, lengths = self.hwords[word]
+                        logLs[word] = model.score(X, lengths)
+                    score = dic(logLs, M)
+                    if score > best_score:
+                        best_score = score
+                        best_model = model
+                except:
+                    continue
+        return best_model
 
 
 class SelectorCV(ModelSelector):
@@ -125,6 +148,42 @@ class SelectorCV(ModelSelector):
 
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # TODO implement model selection using CV
-        raise NotImplementedError
+        best_model = None
+        best_score = float('-inf')
+        len_seq = len(self.sequences)
+        if len_seq == 1:
+            return best_model
+
+        n_splits = min(3, len_seq)
+        kf = KFold(n_splits, random_state=self.random_state)
+
+        for n_comp in range(self.min_n_components, self.max_n_components + 1):
+            logLs = []
+            try:
+                for train_idx, test_idx in kf.split(self.sequences):
+                    X_train, lengths_train = combine_sequences(
+                        train_idx, 
+                        self.sequences
+                    )
+                    X_test, lengths_test = combine_sequences(
+                        test_idx, 
+                        self.sequences
+                    )
+                    model = GaussianHMM(
+                        n_components=n_comp, 
+                        covariance_type="diag", 
+                        n_iter=1000,
+                        random_state=self.random_state, 
+                        verbose=False
+                    ).fit(X_train, lengths_train)
+                    logLs.append(model.score(X_test, lengths_test))
+                score = np.mean(logLs)
+                if score > best_score:
+                    best_score = score
+                    best_model = model
+            except:
+                continue
+        return best_model
