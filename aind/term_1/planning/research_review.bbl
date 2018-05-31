@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+
+\bibitem{PDDL}
+M.~Ghallab, A.~Howe, C.~Knoblock, D.~Mcdermott, A.~Ram, M.~Veloso, D.~Weld, and
+  D.~Wilkins.
+\newblock {PDDL} --- {T}he planning domain definition language.
+\newblock Technical report, 08 1998.
+
+\bibitem{GPS}
+Allen Newell and Herbert~A. Simon.
+\newblock {GPS}: {A} program that simulates human thought.
+\newblock In {\em Computers and Thought}. McGraw-Hill, 1963.
+
+\bibitem{STRIPS}
+Nils~J. Nilsson and Richard~E. Fikes.
+\newblock Strips: A new approach to the application of theorem proving to
+  problem solving.
+\newblock {\em Artifical Intelligence}, 2(3-4):189--208, 1971.
+
+\end{thebibliography}
