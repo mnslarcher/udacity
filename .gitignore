@@ -10,4 +10,6 @@ __pycache__
 *.gz
 *.log
 *.blg
+*.h5
+*.html
 readings
